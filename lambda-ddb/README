@@ -1,0 +1,211 @@
+# README
+# ----------------------------------
+# Magic Leap 
+# Serverless Concept Assignment
+# lambda-dynamodb
+# Author: Ravi
+# ----------------------------------
+
+
+This code base is an experimental API built to demonstrate a serverless application 
+architecture that leverages backend as a service or BaaS components (Amazon DynamoDB, 
+Amazon Gateway and IAM) as well as using AWS Lambda to execute custom and on-demand code.
+
+The APIs implemented run using Java 8 runtime and a few are implemented using node.js 
+for variety.
+
+
+
+1. RESULTS
+
+As an example, here is an URL to get a list of all tasks as deployed in a prod stage using 
+amazon free tier.
+
+https://i8rcr4i4xh.execute-api.us-west-2.amazonaws.com/prod/
+
+Sample results
+
+// 20170307114328
+// https://i8rcr4i4xh.execute-api.us-west-2.amazonaws.com/prod/
+
+{
+  "Items": [
+    {
+      "completed": 1488907528163,
+      "user": "ravi_kumar@msn.com",
+      "priority": 0,
+      "description": "new Task"
+    },
+    {
+      "completed": "\"\"",
+      "user": "ravi@msn.com",
+      "priority": 0,
+      "description": "\"awesome task\""
+    }
+  ],
+  "Count": 2,
+  "ScannedCount": 2
+}
+
+APIS SORTED ORDER
+
+com.serverless.function.TaskListFunctions::getAllTasksOrdered()
+
+This API gets a list of tasks sorted by priority (range key) and uses java Collections::sort and maintains 
+a Big-O time complexity of O(N*log(N)). 
+
+
+SOURCE FILES LIST AND STRUCTURE
+
+./lambda-ddb
+./lambda-ddb/pom.xml
+./lambda-ddb/README
+./lambda-ddb/src
+./lambda-ddb/src/main
+./lambda-ddb/src/main/java
+./lambda-ddb/src/main/java/com
+./lambda-ddb/src/main/java/com/serverless
+./lambda-ddb/src/main/java/com/serverless/dao
+./lambda-ddb/src/main/java/com/serverless/dao/DynamoDBTaskDao.java
+./lambda-ddb/src/main/java/com/serverless/dao/TaskDao.java
+./lambda-ddb/src/main/java/com/serverless/domain
+./lambda-ddb/src/main/java/com/serverless/domain/Task.java
+./lambda-ddb/src/main/java/com/serverless/example
+./lambda-ddb/src/main/java/com/serverless/example/Hello.java
+./lambda-ddb/src/main/java/com/serverless/function
+./lambda-ddb/src/main/java/com/serverless/function/TaskListFunctions.java
+./lambda-ddb/src/main/java/com/serverless/manager
+./lambda-ddb/src/main/java/com/serverless/manager/DynamoDBManager.java
+./lambda-ddb/src/main/java/com/serverless/util
+./lambda-ddb/src/main/java/com/serverless/util/Consts.java
+./lambda-ddb/src/main/resources
+./lambda-ddb/src/main/resources/functions
+./lambda-ddb/src/main/resources/functions/addTask
+./lambda-ddb/src/main/resources/functions/addTask/index.js
+./lambda-ddb/src/main/resources/functions/findAllTasks
+./lambda-ddb/src/main/resources/functions/findAllTasks/index.js
+./lambda-ddb/src/main/resources/roles
+./lambda-ddb/src/main/resources/roles/inlnepolicy-basic-lambda-execute-role-xxx.yaml
+./lambda-ddb/src/main/resources/stages
+./lambda-ddb/src/main/resources/stages/addTask-prod-swagger-integrations,authorizers,documentation.yaml
+./lambda-ddb/src/main/resources/stages/deleteTask-prod-swagger-integrations,authorizers,documentation.yaml
+./lambda-ddb/src/main/resources/stages/getAllTasksOrdered-prod-swagger-integrations,authorizers,documentation.yaml
+./lambda-ddb/src/main/resources/stages/updateTask-prod-swagger-integrations,authorizers,documentation.yaml
+./lambda-ddb/src/test
+./lambda-ddb/src/test/java
+./lambda-ddb/target
+./lambda-ddb/target/classes
+./lambda-ddb/target/LambdaDynamoDB-1.0-shaded.jar
+./lambda-ddb/target/LambdaDynamoDB.jar
+
+
+2. Serverless Architectures
+===========================
+
+
+Application architectures that make significant use of such a compute building block which we shall call as Function as a Service or "FaaS" 
+and/or Backend as a Service or "Baas" are referred to as serverless architectures.
+
+Function as a Service or 'FaaS' is a compute model where custom code is run in ephemeral (transient) containers on 
+demand. AWS provides a service called Lambda supporting this capability. Serverless defers from the traditional architecture 
+in the sense, there isn't always a server sitting behind an application. It is on-demand compute that can significantly reduce 
+the operations cost.
+
+Backend as a Service or "Baas" can be thought of as a collection of 3rd party services (an ecosystem) that are leveraged by a rich 
+application. AWS is an exmaple of BaaS providing services such as Authentication, databases etc.
+  
+3. Requirements for this assignment:
+=================================
+
+An application that Manages a list of tasks : "task list app"
+Multiple clients can access and update the "task list" with scale as a factor. 
+The building blocks need to allow an on-demand scaling or should be tunable.
+
+4. Implementation Strategies
+=============================
+
+1. Declarative/Administrative:
+a. AWS account creation with resources (dynamoDB, AWS Lambda, AppGateway, IAM).
+
+2. Task list Table
+
+a. Sample shell script creates table in DDB(data source)
+
+(
+  setlocal EnableDelayedExpansion
+  aws dynamodb create-table ^
+    --table-name task ^
+    --attribute-definitions ^
+        AttributeName=description,AttributeType=S ^
+        AttributeName=priority,AttributeType=N ^
+        AttributeName=user,AttributeType=S ^
+        AttributeName=completed,AttributeType=S ^
+    --key-schema AttributeName=description,KeyType=HASH AttributeName=priority,KeyType=RANGE ^
+    --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+  endlocal
+)
+
+
+b. create a table in dynamodb called "task" DONE.
+   It must have the attributes: "user" (string), "description" (string) , "priority" (integer), "completed" (date-time) 
+	
+3. IAM Resources
+a. created two groups (admin, developers)
+b. Added users with permissions to both groups.
+c. Added roles for executing lambda, dynamoDB and app gateway access permissions.
+
+Sample IAM Policy can be found in the git repo. This is an inline policy for basic-lambda-execution-role which allows all access 
+which in real prod can be fine grained.
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1488907443000",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:*"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:us-west-2:547027940144:table/tasks"
+            ]
+        }
+    ]
+}
+
+
+5. DEPLOYMENT STRATEGIES
+=========================
+
+Created a stage called prod in the AppGateway and deployed the APIs.
+
+The assigment tests the user's ability to use continuous integration and deployment tools 
+as well as resource management tools.
+
+At amazon as an employee, I have access to internal tools that provide most of the 
+functionality. However, I see why terraform is needed as clourformation which is available 
+outside amazon leaves gaps.
+
+
+6. KNOWN LIMITATIONS
+=====================
+
+Primarily due to self-imposed time limits, some parts of the assignment have limitated 
+completion:
+
+1. The Social use case is not implemented in this code.
+
+However, this is an use case that I currently implement at work at Verizon 
+for a Team COncept. 
+
+The architecture uses a message broker (rabbitMQ similar to amazon's SQS/SNS) and 
+uses a topic based exchange which allows filtering, read and write access control.
+
+2. using Terraform to describe and manage the resources. 
+
+Although, I looked into this and understood, not able to provide a deployment descriptor 
+created using terraform that unifies resource management. 
+
+AWS tools were used in deploying to stage which eventually needs to be migrated to something like 
+terraform or cloudformation for wholesome maintainence.
+

@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1488907443000",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:*"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:us-west-2:547027940144:table/tasks"
+            ]
+        }
+    ]
+}
