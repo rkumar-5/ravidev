@@ -7,9 +7,12 @@
 # ----------------------------------
 
 
-This code base is a set of experimental APIs built that demonstrate a serverless application 
-architecture --- that leverages backend as a service or BaaS components (Amazon DynamoDB, 
-Amazon Gateway and IAM) as well as a FaaS concept using AWS Lambda to execute custom and on-demand code.
+This code base is a set of experimental APIs built to demonstrate a serverless application 
+architecture.
+
+The concept leverages backend as a service or BaaS (Amazon DynamoDB,Amazon Gateway and IAM) as 
+well as a FaaS or Function as a Service using as an example, AWS Lambda to execute custom 
+and on-demand code.
 
 The APIs implemented run using Java 8 runtime and a few are implemented using node.js for variety.
 
@@ -52,8 +55,8 @@ Sample results
 
 com.serverless.function.TaskListFunctions::getAllTasksOrdered()
 
-This API gets a list of tasks sorted by priority (range key) and uses java Collections::sort and maintains 
-a Big-O time complexity of O(N*log(N)). 
+This API gets a list of tasks that are sorted using the priority (range key) field in a task. Then the java Collections::sort 
+is used to order by completion date and maintains a Big-O time complexity of O(N*log(N)). 
 
 
 SOURCE FILES LIST AND STRUCTURE
@@ -146,9 +149,12 @@ a. Sample shell script creates table in DDB(data source)
 )
 
 
-b. create a table in dynamodb called "task" DONE.
+b. create a table in dynamodb called "tasks".
    It must have the attributes: "user" (string), "description" (string) , "priority" (integer), "completed" (date-time) 
-	
+   Schema/Model for the tables in the data source is decided by the kind of feequent queries that we run! The assignment 
+   does not have stringent requirements. However, one can create additional indexes depending on frequency and with 
+   considerations to the cost factor.
+   
 3. IAM Resources
 a. created two groups (admin, developers)
 b. Added users with permissions to both groups.
