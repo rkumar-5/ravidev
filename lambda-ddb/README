@@ -7,16 +7,17 @@
 # ----------------------------------
 
 
-This code base is an experimental API built to demonstrate a serverless application 
-architecture that leverages backend as a service or BaaS components (Amazon DynamoDB, 
-Amazon Gateway and IAM) as well as using AWS Lambda to execute custom and on-demand code.
+This code base is a set of experimental APIs built that demonstrate a serverless application 
+architecture --- that leverages backend as a service or BaaS components (Amazon DynamoDB, 
+Amazon Gateway and IAM) as well as a FaaS concept using AWS Lambda to execute custom and on-demand code.
 
-The APIs implemented run using Java 8 runtime and a few are implemented using node.js 
-for variety.
+The APIs implemented run using Java 8 runtime and a few are implemented using node.js for variety.
+
+1. CODE REPOSIT URL
+https://github.com/rkumar-5/ravidev 
 
 
-
-1. RESULTS
+2. RESULTS
 
 As an example, here is an URL to get a list of all tasks as deployed in a prod stage using 
 amazon free tier.
@@ -47,7 +48,7 @@ Sample results
   "ScannedCount": 2
 }
 
-APIS SORTED ORDER
+2. a. API RETURNING AN ORDERED LIST
 
 com.serverless.function.TaskListFunctions::getAllTasksOrdered()
 
@@ -99,9 +100,8 @@ SOURCE FILES LIST AND STRUCTURE
 ./lambda-ddb/target/LambdaDynamoDB.jar
 
 
-2. Serverless Architectures
+3. Serverless Architectures
 ===========================
-
 
 Application architectures that make significant use of such a compute building block which we shall call as Function as a Service or "FaaS" 
 and/or Backend as a Service or "Baas" are referred to as serverless architectures.
@@ -114,14 +114,14 @@ the operations cost.
 Backend as a Service or "Baas" can be thought of as a collection of 3rd party services (an ecosystem) that are leveraged by a rich 
 application. AWS is an exmaple of BaaS providing services such as Authentication, databases etc.
   
-3. Requirements for this assignment:
+4. Requirements for this assignment:
 =================================
 
 An application that Manages a list of tasks : "task list app"
 Multiple clients can access and update the "task list" with scale as a factor. 
 The building blocks need to allow an on-demand scaling or should be tunable.
 
-4. Implementation Strategies
+5. Implementation Strategies
 =============================
 
 1. Declarative/Administrative:
@@ -174,7 +174,7 @@ which in real prod can be fine grained.
 }
 
 
-5. DEPLOYMENT STRATEGIES
+6. DEPLOYMENT STRATEGIES
 =========================
 
 Created a stage called prod in the AppGateway and deployed the APIs.
@@ -187,7 +187,7 @@ functionality. However, I see why terraform is needed as clourformation which is
 outside amazon leaves gaps.
 
 
-6. KNOWN LIMITATIONS
+7. KNOWN LIMITATIONS
 =====================
 
 Primarily due to self-imposed time limits, some parts of the assignment have limitated 
